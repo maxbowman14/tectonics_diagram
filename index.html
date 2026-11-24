@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Plate Tectonics</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f2f6fa;
+}
+
+.container{
+    display:flex;
+    flex-wrap:wrap;
+    max-width:1200px;
+    margin:0 auto;
+    background:white;
+}
+
+.diagram-panel{
+    flex:3;
+    min-width:600px;
+    padding:10px;
+}
+
+.image-wrapper{
+    position:relative;
+    width:100%;
+}
+
+.image-wrapper img{
+    width:100%;
+    display:block;
+}
+
+.hotspot{
+    position:absolute;
+    cursor:pointer;
+    border-radius:8px;
+    transition:.25s;
+    background:rgba(255,255,255,0);
+    border:2px solid transparent;
+}
+
+.hotspot:hover{
+    background:rgba(255,255,0,.3);
+    border-color:gold;
+    transform:scale(1.08);
+}
+
+.hotspot.visited{
+    background:rgba(0,255,0,.2);
+    border-color:limegreen;
+}
+
+.side-panel{
+    flex:1;
+    min-width:280px;
+    background:#fafafa;
+    border-left:2px solid #ccc;
+    padding:20px;
+}
+
+.side-panel h2{
+    margin-top:0;
+    color:#154360;
+}
+
+.progress{
+    width:100%;
+    height:24px;
+    background:#ddd;
+    border-radius:20px;
+    overflow:hidden;
+    margin:15px 0;
+}
+
+.progress-bar{
+    width:0%;
+    height:100%;
+    background:#3498db;
+    color:white;
+    text-align:center;
+    line-height:24px;
+    transition:.5s;
+}
+
+.challenge{
+    margin-top:15px;
+    background:#eaf4ff;
+    padding:12px;
+    border-left:5px solid #3498db;
+    border-radius:4px;
+}
+
+.complete{
+    background:#d5ffd8;
+    border-left-color:#27ae60;
+}
+
+.learning-target{
+    background:#fff8dc;
+    border-left:5px solid #f39c12;
+    padding:10px;
+    margin-top:15px;
+}
+
+@media(max-width:900px){
+
+    .container{
+        flex-direction:column;
+    }
+
+    .diagram-panel{
+        min-width:100%;
+    }
+
+    .side-panel{
+        border-left:none;
+        border-top:2px solid #ccc;
+    }
+
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="diagram-panel">
+
+<div class="image-wrapper">
+
+<img src="platetectonics.png" alt="Plate Tectonics Diagram">
+
+<!-- Converging Plates -->
+<div class="hotspot"
+     data-topic="converging"
+     title="Converging Plates"
+     style="left:28%; top:10%; width:18%; height:7%;">
+</div>
+
+<!-- Trench -->
+<div class="hotspot"
+     data-topic="trench"
+     title="Trench"
+     style="left:50%; top:10%; width:8%; height:7%;">
+</div>
+
+<!-- Seafloor Spreading -->
+<div class="hotspot"
+     data-topic="spreading"
+     title="Seafloor Spreading"
+     style="left:61%; top:1%; width:16%; height:8%;">
+</div>
+
+<!-- Mid-Ocean Ridge -->
+<div class="hotspot"
+     data-topic="ridge"
+     title="Mid-Ocean Ridge"
+     style="left:80%; top:9%; width:15%; height:7%;">
+</div>
+
+<!-- Volcano -->
+<div class="hotspot"
+     data-topic="volcano"
+     title="Volcano"
+     style="left:2%; top:76%; width:10%; height:8%;">
+</div>
+
+<!-- Subduction Zone -->
+<div class="hotspot"
+     data-topic="subduction"
+     title="Subduction Zone"
+     style="left:7%; top:92%; width:18%; height:7%;">
+</div>
+
+<!-- Hot Spot -->
+<div class="hotspot"
+     data-topic="hotspot"
+     title="Hot Spot"
+     style="left:35%; top:95%; width:12%; height:5%;">
+</div>
+
+<!-- Diverging Plates -->
+<div class="hotspot"
+     data-topic="diverging"
+     title="Diverging Plates"
+     style="left:69%; top:75%; width:18%; height:8%;">
+</div>
+
+</div>
+</div>
+
+<div class="side-panel">
+
+<h2>Plate Tectonics Explorer</h2>
+
+<p>
+Click the red labels to learn about each tectonic feature.
+</p>
+
+<div class="progress">
+<div class="progress-bar" id="progressBar">0%</div>
+</div>
+
+<div id="content">
+
+<div class="learning-target">
+<strong>Learning Target</strong><br>
+I can explain how plate movement creates Earth's major geologic features.
+</div>
+
+<p>
+Mission Progress: 0 of 8 features explored.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const topics = {
+
+converging:{
+title:"Converging Plates",
+text:"Convergent boundaries occur when two tectonic plates move toward each other. These collisions can build mountain ranges, trigger earthquakes, and create volcanic arcs.",
+question:"What evidence would show that two plates are moving toward one another?",
+target:"I can explain how plate collisions affect Earth's surface."
+},
+
+trench:{
+title:"Ocean Trench",
+text:"Trenches are deep depressions in the ocean floor. They form where an oceanic plate begins sinking beneath another plate.",
+question:"Why are trenches among the deepest places on Earth?",
+target:"I can identify evidence of subduction."
+},
+
+spreading:{
+title:"Seafloor Spreading",
+text:"New ocean crust forms as magma rises at mid-ocean ridges and cools. This process slowly pushes plates apart.",
+question:"What happens to ocean crust as new crust forms?",
+target:"I can explain how new crust is created."
+},
+
+ridge:{
+title:"Mid-Ocean Ridge",
+text:"A mid-ocean ridge is an underwater mountain chain formed at divergent boundaries where magma rises through Earth's crust.",
+question:"Why are ridges evidence that plates move?",
+target:"I can connect plate movement to seafloor features."
+},
+
+volcano:{
+title:"Volcano",
+text:"Volcanoes form when magma reaches Earth's surface. Many develop near plate boundaries where crust is weakened.",
+question:"Why are volcanoes common near plate boundaries?",
+target:"I can explain the relationship between magma and plate movement."
+},
+
+subduction:{
+title:"Subduction Zone",
+text:"A subduction zone forms when one tectonic plate sinks beneath another into the mantle.",
+question:"How can subduction create both earthquakes and volcanoes?",
+target:"I can explain what happens when plates collide."
+},
+
+hotspot:{
+title:"Hot Spot",
+text:"Hot spots form above plumes of hot mantle material rising from deep inside Earth. They can create volcanoes away from plate boundaries.",
+question:"How is a hot spot different from a plate boundary volcano?",
+target:"I can compare different causes of volcanic activity."
+},
+
+diverging:{
+title:"Diverging Plates",
+text:"Divergent boundaries occur where tectonic plates move apart, allowing magma to rise and create new crust.",
+question:"What landforms are created at divergent boundaries?",
+target:"I can explain how plates moving apart reshape Earth."
+}
+
+};
+
+const visited = new Set();
+
+document.querySelectorAll(".hotspot")
+.forEach(hotspot=>{
+
+hotspot.addEventListener("click",()=>{
+
+const id = hotspot.dataset.topic;
+const topic = topics[id];
+
+visited.add(id);
+hotspot.classList.add("visited");
+
+updateProgress();
+
+document.getElementById("content").innerHTML = `
+<h2>${topic.title}</h2>
+
+<p>${topic.text}</p>
+
+<div class="learning-target">
+<strong>Success Criterion</strong><br>
+${topic.target}
+</div>
+
+<div class="challenge">
+<strong>Think About It:</strong><br><br>
+${topic.question}
+</div>
+
+<p><strong>Features Explored:</strong> ${visited.size}/8</p>
+`;
+
+});
+
+});
+
+function updateProgress(){
+
+const percentage =
+Math.round((visited.size/8)*100);
+
+const bar =
+document.getElementById("progressBar");
+
+bar.style.width = percentage + "%";
+bar.textContent = percentage + "%";
+
+if(visited.size === 8){
+
+document.getElementById("content").innerHTML += `
+<div class="challenge complete">
+<strong>Mission Complete!</strong><br><br>
+You explored all eight plate tectonics features and demonstrated how plate movement shapes Earth's surface.
+</div>
+`;
+}
+
+}
+</script>
+
+</body>
+</html>
